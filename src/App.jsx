@@ -24,8 +24,8 @@ export default function App() {
           height: 56, position: 'sticky', top: 0, zIndex: 100,
           boxShadow: '0 1px 6px rgba(0,0,0,.05)',
         }}>
-          <span style={{ fontSize: 22 }}>🏢</span>
-          <span style={{ fontSize: 16, fontWeight: 600 }}>Gestão Empresarial</span>
+          <span style={{ fontSize: 22 }}>🌿</span>
+          <span style={{ fontSize: 16, fontWeight: 600 }}>Comercial Jardinense</span>
         </header>
 
         {/* Layout */}
