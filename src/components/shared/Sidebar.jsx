@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
 import { subscribeCollection } from '../../lib/firestore'
+import { diffDays, parseDate } from '../../lib/utils'
 
 const TABS = [
-  { id: 'fin',     icon: '💰', label: 'Finanças'  },
-  { id: 'est',     icon: '📦', label: 'Estoque'   },
-  { id: 'compras', icon: '🛍️', label: 'Compras'   },
-  { id: 'cli',     icon: '👤', label: 'Clientes'  },
-  { id: 'vnd',     icon: '🛒', label: 'Vendas'    },
-  { id: 'fic',     icon: '📋', label: 'Fichas'    },
-  { id: 'boletos', icon: '📄', label: 'Boletos'   },
+  { id: 'dash',      icon: '📊', label: 'Dashboard'  },
+  { id: 'fin',       icon: '💰', label: 'Finanças'   },
+  { id: 'caixa',     icon: '🏧', label: 'Caixa'      },
+  { id: 'est',       icon: '📦', label: 'Estoque'    },
+  { id: 'compras',   icon: '🛍️', label: 'Compras'    },
+  { id: 'cli',       icon: '👤', label: 'Clientes'   },
+  { id: 'vnd',       icon: '🛒', label: 'Vendas'     },
+  { id: 'fic',       icon: '📋', label: 'Fichas'     },
+  { id: 'boletos',   icon: '📄', label: 'Boletos'    },
+  { id: 'relatorios',icon: '📈', label: 'Relatórios' },
 ]
 
 export default function Sidebar({ active, onChange }) {
@@ -16,16 +20,14 @@ export default function Sidebar({ active, onChange }) {
   const [boletosPend, setBoletosPend] = useState(0)
 
   useEffect(() => {
-    const u1 = subscribeCollection('fichas',  list => setFichasPend(list.filter(f => f.status === 'pendente').length))
+    const u1 = subscribeCollection('fichas', list =>
+      setFichasPend(list.filter(f => f.status === 'pendente').length)
+    )
     const u2 = subscribeCollection('boletos', list => {
-      const hoje = new Date(); hoje.setHours(0,0,0,0)
       const venc = list.filter(b => {
         if (b.status === 'pago') return false
-        if (!b.vencimento) return false
-        let d
-        if (b.vencimento.includes('-')) d = new Date(b.vencimento + 'T00:00:00')
-        else { const [dia,mes,ano] = b.vencimento.split('/'); d = new Date(`${ano}-${mes}-${dia}T00:00:00`) }
-        return d <= hoje
+        const d = parseDate(b.vencimento)
+        return d && diffDays(d) <= 0
       })
       setBoletosPend(venc.length)
     }, 'vencimento')
